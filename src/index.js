@@ -6,7 +6,7 @@ import "./styles.css";
 const centerX = 300;
 const centerY = 300;
 const radius = 200;
-const offset = 0;
+const offset = 10;
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -50,6 +50,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <div>
+          <label for="points">Complexity: </label>
           <input
             onChange={this.handlePoints}
             type="range"
@@ -60,7 +61,6 @@ class App extends React.Component {
             step="2"
             max="20"
           />
-          <label for="points">Points</label>
         </div>
         <svg
           width="300"
@@ -94,7 +94,9 @@ class App extends React.Component {
             />
           </g>
         </svg>
-        <button onClick={this.refresh}>Refresh</button>
+        <div>
+          <button onClick={this.refresh}>Refresh</button>
+        </div>
       </div>
     );
   }
