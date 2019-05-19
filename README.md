@@ -1,2 +1,0 @@
-# svgBlobCreator
-Created with CodeSandbox
