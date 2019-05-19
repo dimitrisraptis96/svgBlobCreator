@@ -5,8 +5,10 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "file-saver": "2.0.2",
     "react": "16.8.6",
     "react-dom": "16.8.6",
+    "react-element-to-jsx-string": "14.0.2",
     "react-scripts": "2.1.8"
   },
   "devDependencies": {

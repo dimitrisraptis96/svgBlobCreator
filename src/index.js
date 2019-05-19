@@ -1,5 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { saveAs } from "file-saver";
+import reactElementToJSXString from "react-element-to-jsx-string";
 
 import "./styles.css";
 
@@ -36,6 +38,51 @@ class App extends React.Component {
     this.setState({ points: this.state.points });
   };
 
+  download = (points, angle) => {
+    const transform = `skewX(${getRandomInt(10)}) skewY(${getRandomInt(
+      10
+    )}) rotate(${getRandomInt(360)} ${centerX} ${centerY})`;
+
+    const dataPath = points.map((point, index) => {
+      const nextIndex = index + 1 === points.length ? 0 : index + 1;
+      const nextPoint = points[nextIndex];
+      const mediumPoint = getPointOnCircle(point.angle + angle / 2);
+
+      if (index === 0) {
+        return `
+                  M  ${point.x} ${point.y}
+                  Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${
+          nextPoint.y
+        } 
+                `;
+      } else {
+        return `T ${nextPoint.x} ${nextPoint.y}`;
+      }
+    });
+    var content = `
+    <svg
+    width="300"
+    height="300"
+    viewBox="0 0 600 600"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g>
+      <path
+        d="${dataPath}"
+        transform="${transform}"
+        fill="salmon"
+      />
+    </g>
+  </svg>
+    `;
+    var filename = "blob.svg";
+
+    var blob = new Blob([content], {
+      type: "text/plain;charset=utf-8"
+    });
+    saveAs(blob, filename);
+  };
+
   render() {
     const { points } = this.state;
     const angle = findAngleRad(points);
@@ -50,7 +97,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <div>
-          <label for="points">Complexity: </label>
+          <label htmlFor="points">Complexity: </label>
           <input
             onChange={this.handlePoints}
             type="range"
@@ -96,6 +143,9 @@ class App extends React.Component {
         </svg>
         <div>
           <button onClick={this.refresh}>Refresh</button>
+          <button onClick={() => this.download(pointsArray, angle)}>
+            Download
+          </button>
         </div>
       </div>
     );
