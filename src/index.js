@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { saveAs } from "file-saver";
-import reactElementToJSXString from "react-element-to-jsx-string";
 
 import "./styles.css";
 
@@ -115,6 +114,64 @@ class App extends React.Component {
           viewBox="0 0 600 600"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <defs>
+            <linearGradient
+              id="linear-gradient"
+              x1="0%"
+              y1="0"
+              x2="100%"
+              y2="0"
+            >
+              <stop offset="0" stop-color="#43E97B">
+                <animate
+                  attributeName="stop-color"
+                  values="#43E97B;#38F9D7"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset=".2" stop-color="#38F9D7">
+                <animate
+                  attributeName="stop-color"
+                  values="#38F9D7;#E0C3FC"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset=".4" stop-color="#E0C3FC">
+                <animate
+                  attributeName="stop-color"
+                  values="#E0C3FC;#8EC5FC"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset=".6" stop-color="#8EC5FC">
+                <animate
+                  attributeName="stop-color"
+                  values="#8EC5FC;#4FACFE"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset=".8" stop-color="#4FACFE">
+                <animate
+                  attributeName="stop-color"
+                  values="#4FACFE;#00F2FE"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset="1" stop-color="#00F2FE">
+                <animate
+                  attributeName="stop-color"
+                  values="#00F2FE;#43E97B"
+                  dur="1s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+            </linearGradient>
+          </defs>
           <g>
             <path
               transform={`skewX(${getRandomInt(10)}) skewY(${getRandomInt(
@@ -137,7 +194,7 @@ class App extends React.Component {
                   return `T ${nextPoint.x} ${nextPoint.y}`;
                 }
               })}
-              fill="salmon"
+              fill="url(#linear-gradient)"
             />
           </g>
         </svg>
