@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { saveAs } from "file-saver";
-import reactElementToJSXString from "react-element-to-jsx-string";
 
 import "./styles.css";
 
@@ -115,6 +114,12 @@ class App extends React.Component {
           viewBox="0 0 600 600"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <defs>
+            <linearGradient id="linear-gradient">
+              <stop offset="0" stop-color="#43E97B" />
+              <stop offset="1" stop-color="#38F9D7" />
+            </linearGradient>
+          </defs>
           <g>
             <path
               transform={`skewX(${getRandomInt(10)}) skewY(${getRandomInt(
@@ -137,7 +142,7 @@ class App extends React.Component {
                   return `T ${nextPoint.x} ${nextPoint.y}`;
                 }
               })}
-              fill="salmon"
+              fill="url(#linear-gradient)"
             />
           </g>
         </svg>
