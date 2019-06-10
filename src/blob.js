@@ -3,7 +3,7 @@ import gradients from "./gradients";
 const CENTER_X = 300;
 const CENTER_Y = 300;
 const RADIUS = 200;
-const OFFSET = 10;
+const OFFSET = 20;
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -50,17 +50,18 @@ function getPathData(pointsArray, angle) {
 
 function getPath(points) {
   const angle = findAngleRad(points);
-  const pointsArray = calculatePoints(points, angle);
+  const pointsArray = getPointsArray(points, angle);
 
+  // transform="${getPathTransform()}"
   return `
       <path
-        transform="${getPathTransform()}"
+        id="blob-path"
         d="${getPathData(pointsArray, angle)}"
         fill="url(#linear-gradient)"
       />`;
 }
 
-function calculatePoints(points, angle) {
+function getPointsArray(points, angle) {
   const pointsArray = [];
   for (let i = 0; i < points; i++) {
     pointsArray.push(getPointOnCircle((i + 1) * angle));
@@ -100,4 +101,4 @@ function createBlobString(points) {
     `;
 }
 
-export default createBlobString;
+export { createBlobString, getPathData, getPointsArray };

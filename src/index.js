@@ -2,13 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import anime from "animejs";
 import { saveAs } from "file-saver";
-import createBlobString from "./blob";
+import { createBlobString, getPathData, getPointsArray } from "./blob";
 
 class App extends React.Component {
   state = {
     points: 4
   };
-
   componentDidMount() {
     this.setupAnimeJS();
   }
@@ -37,16 +36,68 @@ class App extends React.Component {
   };
 
   setupAnimeJS = () => {
-    const el = document.getElementById("blob-svg");
+    // const el = this.blob.querySelector("svg");
+    const morphing = this.morphing.querySelector("path");
+
+    // anime({
+    //   targets: el,
+    //   scaleX: [1, 0.9, 1.1, 0.95],
+    //   scaleY: [1, 1.1, 0.9, 1.05],
+    //   loop: 2,
+    //   direction: "alternate",
+    //   easing: "easeInSine",
+    //   duration: 1200
+    // });
+    const paths = [
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(","),
+      getPathData(
+        getPointsArray(this.state.points, 360 / this.state.points),
+        360 / this.state.points
+      ).join(",")
+    ];
 
     anime({
-      targets: el,
-      scaleX: [1, 0.9, 1.1, 0.95],
-      scaleY: [1, 1.1, 0.9, 1.05],
-      loop: 2,
+      targets: morphing,
+      d: paths.map(path => ({ value: [path], duration: 400 })),
+      loop: true,
       direction: "alternate",
       easing: "easeInSine",
-      duration: 1200
+      duration: 1500
     });
   };
 
@@ -70,8 +121,13 @@ class App extends React.Component {
             max="14"
           />
         </div>
-        <div
+        {/* <div
           ref={ref => (this.blob = ref)}
+          dangerouslySetInnerHTML={{ __html: blobString }}
+        /> */}
+
+        <div
+          ref={ref => (this.morphing = ref)}
           dangerouslySetInnerHTML={{ __html: blobString }}
         />
         <div>
