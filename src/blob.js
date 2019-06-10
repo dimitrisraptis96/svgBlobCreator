@@ -1,3 +1,5 @@
+import gradients from "./gradients";
+
 const CENTER_X = 300;
 const CENTER_Y = 300;
 const RADIUS = 200;
@@ -67,7 +69,7 @@ function calculatePoints(points, angle) {
 }
 
 function getRandomGradientColors() {
-  return ["#43E97B", "#38F9D7"];
+  return gradients[Math.floor(Math.random() * gradients.length)];
 }
 
 function getLinearGradient() {
