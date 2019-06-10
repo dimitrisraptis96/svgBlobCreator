@@ -6,14 +6,15 @@ import { createBlobString, getPathData, getPoints } from "./blob";
 
 class App extends React.Component {
   state = {
-    numOfPoints: 4
+    numOfPoints: 4,
+    isPlaying: false
   };
   componentDidMount() {
     this.setupAnimeJS();
   }
 
   componentDidUpdate() {
-    this.setupAnimeJS();
+    // this.setupAnimeJS();
   }
 
   handlePoints = e => {
@@ -22,7 +23,7 @@ class App extends React.Component {
 
   refresh = () => {
     const { numOfPoints } = this.state;
-    this.setState({ numOfPoints: numOfPoints });
+    this.setState({ numOfPoints });
   };
 
   download = blobSVG => {
@@ -60,19 +61,32 @@ class App extends React.Component {
       });
     }
 
-    anime({
+    this.animation = anime({
       targets: morphing,
       d: paths,
       loop: true,
       direction: "alternate",
       easing: "easeInSine",
+      // autoplay: false,
       duration: 1500
     });
   };
 
-  render() {
-    const { numOfPoints } = this.state;
+  toggleIsPlaying = () => {
+    const { isPlaying } = this.state;
+    this.setState({ isPlaying: !isPlaying });
 
+    if (isPlaying) {
+      this.animation.pause();
+    } else {
+      this.animation.play();
+    }
+  };
+
+  render() {
+    const { numOfPoints, isPlaying } = this.state;
+
+    // const controlButtonText = isPlaying ? "Stop" : "Play"};
     const blobString = createBlobString(numOfPoints);
 
     return (
@@ -102,6 +116,9 @@ class App extends React.Component {
         <div>
           <button onClick={this.refresh}>Refresh</button>
           <button onClick={() => this.download(blobString)}>Download</button>
+          <button onClick={this.toggleIsPlaying}>
+            {isPlaying ? "Stop" : "Play"}
+          </button>
         </div>
       </div>
     );
