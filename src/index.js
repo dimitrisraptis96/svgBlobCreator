@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import anime from "animejs";
 import { saveAs } from "file-saver";
-import { createBlobString, getPathData, getPointsArray } from "./blob";
+import { createBlobString, getPathData, getPoints } from "./blob";
 
 class App extends React.Component {
   state = {
-    points: 4
+    numOfPoints: 4
   };
   componentDidMount() {
     this.setupAnimeJS();
@@ -17,12 +17,12 @@ class App extends React.Component {
   }
 
   handlePoints = e => {
-    this.setState({ points: e.target.value });
+    this.setState({ numOfPoints: e.target.value });
   };
 
   refresh = () => {
-    const { points } = this.state;
-    this.setState({ points: points });
+    const { numOfPoints } = this.state;
+    this.setState({ numOfPoints: numOfPoints });
   };
 
   download = blobSVG => {
@@ -48,52 +48,21 @@ class App extends React.Component {
     //   easing: "easeInSine",
     //   duration: 1200
     // });
-    const paths = [
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(","),
-      getPathData(
-        getPointsArray(this.state.points, 360 / this.state.points),
-        360 / this.state.points
-      ).join(",")
-    ];
+    const { numOfPoints } = this.state;
+    const angle = 360 / numOfPoints;
+    const MAX = 10;
+
+    const paths = [];
+    for (let i = 0; i < MAX; i++) {
+      paths.push({
+        value: getPathData(getPoints(numOfPoints, angle), angle).join(","),
+        duration: 400
+      });
+    }
 
     anime({
       targets: morphing,
-      d: paths.map(path => ({ value: [path], duration: 400 })),
+      d: paths,
       loop: true,
       direction: "alternate",
       easing: "easeInSine",
@@ -102,9 +71,9 @@ class App extends React.Component {
   };
 
   render() {
-    const { points } = this.state;
+    const { numOfPoints } = this.state;
 
-    const blobString = createBlobString(points);
+    const blobString = createBlobString(numOfPoints);
 
     return (
       <div>
@@ -113,9 +82,9 @@ class App extends React.Component {
           <input
             onChange={this.handlePoints}
             type="range"
-            value={points}
+            value={numOfPoints}
             id="points"
-            name="points"
+            name="Points"
             min="4"
             step="2"
             max="14"

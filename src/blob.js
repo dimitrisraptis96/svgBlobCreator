@@ -16,8 +16,8 @@ function getPointOnCircle(angle) {
   return { x, y, angle };
 }
 
-function findAngleRad(points) {
-  return 360 / points;
+function findAngleRad(numOfPoints) {
+  return 360 / numOfPoints;
 }
 
 function getPathTransform() {
@@ -27,12 +27,12 @@ function getPathTransform() {
   return `${skewX} ${skewY} ${rotate}`;
 }
 
-function getPathData(pointsArray, angle) {
-  const numOfPoints = pointsArray.length;
+function getPathData(points, angle) {
+  const numOfPoints = points.length;
 
-  return pointsArray.map((point, index) => {
+  return points.map((point, index) => {
     const nextIndex = index + 1 === numOfPoints ? 0 : index + 1;
-    const nextPoint = pointsArray[nextIndex];
+    const nextPoint = points[nextIndex];
     const mediumPoint = getPointOnCircle(point.angle + angle / 2);
 
     if (index === 0) {
@@ -48,25 +48,34 @@ function getPathData(pointsArray, angle) {
   });
 }
 
-function getPath(points) {
-  const angle = findAngleRad(points);
-  const pointsArray = getPointsArray(points, angle);
+function getPath(numOfPoints) {
+  const angle = findAngleRad(numOfPoints);
+  const points = getPoints(numOfPoints, angle);
 
   // transform="${getPathTransform()}"
   return `
       <path
         id="blob-path"
-        d="${getPathData(pointsArray, angle)}"
+        d="${getPathData(points, angle)}"
         fill="url(#linear-gradient)"
       />`;
 }
 
-function getPointsArray(points, angle) {
-  const pointsArray = [];
-  for (let i = 0; i < points; i++) {
-    pointsArray.push(getPointOnCircle((i + 1) * angle));
+function getPoints(numOfPoints, angle) {
+  // const points = [];
+  // for (let i = 0; i < numOfPoints; i++) {
+  //   points.push(getPointOnCircle((i + 1) * angle));
+  // }
+  // return points;
+  const angleOffset = 0.1 * getRandomInt(5);
+
+  const points = [];
+  for (let i = 0; i < numOfPoints; i++) {
+    var offset = (angleOffset * angle * -1) ^ i;
+    var point = getPointOnCircle((i + 1) * angle + offset);
+    points.push(point);
   }
-  return pointsArray;
+  return points;
 }
 
 function getRandomGradientColors() {
@@ -86,7 +95,7 @@ function getLinearGradient() {
       </linearGradient>`;
 }
 
-function createBlobString(points) {
+function createBlobString(numOfPoints) {
   return `
       <svg
         id="blob-svg"
@@ -96,9 +105,9 @@ function createBlobString(points) {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>${getLinearGradient()}</defs>
-        <g>${getPath(points)}</g>
+        <g>${getPath(numOfPoints)}</g>
       </svg>
     `;
 }
 
-export { createBlobString, getPathData, getPointsArray };
+export { createBlobString, getPathData, getPoints };
