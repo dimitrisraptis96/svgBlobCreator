@@ -56,7 +56,7 @@ class App extends React.Component {
     const paths = [];
     for (let i = 0; i < MAX; i++) {
       paths.push({
-        value: getPathData(getPoints(numOfPoints, angle), angle).join(","),
+        value: getPathData(getPoints(numOfPoints, angle), angle),
         duration: 400
       });
     }

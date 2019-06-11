@@ -3,7 +3,7 @@ import gradients from "./gradients";
 const CENTER_X = 300;
 const CENTER_Y = 300;
 const RADIUS = 200;
-const OFFSET = 20;
+const OFFSET = 10;
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -30,23 +30,44 @@ function getPathTransform() {
 function getPathData(points, angle) {
   const numOfPoints = points.length;
 
-  return points.map((point, index) => {
-    const nextIndex = index + 1 === numOfPoints ? 0 : index + 1;
-    const nextPoint = points[nextIndex];
-    const mediumPoint = getPointOnCircle(point.angle + angle / 2);
+  return points
+    .map((point, index) => {
+      const isFirst = index === 0;
+      const isLast = index + 1 === numOfPoints;
 
-    if (index === 0) {
-      return `
-              M  ${point.x} ${point.y}
-              Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${
-        nextPoint.y
-      } 
-            `;
-    } else {
-      return `T ${nextPoint.x} ${nextPoint.y}`;
-    }
-  });
+      const nextIndex = isLast ? 0 : index + 1;
+      const nextPoint = points[nextIndex];
+      const mediumPoint = getPointOnCircle(
+        point.angle + (nextPoint.angle - point.angle) / 2
+      );
+
+      if (isFirst) {
+        return `
+        M  ${point.x} ${point.y}
+        Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${nextPoint.y} 
+    `;
+      } else {
+        return `T ${nextPoint.x} ${nextPoint.y}`;
+      }
+    })
+    .join(" ");
+  // .replace(" ", "");
 }
+
+const svgPath = (points, command) => {
+  // build the d attributes by looping over the points
+  return points.reduce(
+    (acc, point, i, a) =>
+      i === 0
+        ? // if first point
+          `M ${point[0]},${point[1]}`
+        : // else
+          `${acc} ${command(point, i, a)}`,
+    ""
+  );
+};
+
+const lineCommand = point => `L ${point[0]} ${point[1]}`;
 
 function getPath(numOfPoints) {
   const angle = findAngleRad(numOfPoints);
@@ -56,7 +77,11 @@ function getPath(numOfPoints) {
   return `
       <path
         id="blob-path"
-        d="${getPathData(points, angle)}"
+        d="${getPathData(points, angle)} ${svgPath(
+    points.map(p => [p.x, p.y]),
+    lineCommand
+  )}"
+  stroke="black"
         fill="url(#linear-gradient)"
       />`;
 }
