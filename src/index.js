@@ -1,20 +1,65 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import styled from "styled-components";
 import anime from "animejs";
 import { saveAs } from "file-saver";
 import { createBlobString, getPathData, getPoints } from "./blob";
 
+const INITIAL_DIMS = [500, 500];
+const Wrapper = styled.div`
+  position: relative;
+  width: 200px;
+  height: 200px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  > div {
+    position: absolute;
+    /* top: 50%;
+    left: 50%; */
+  }
+  && > div:nth-child(1) > svg {
+    width: 200px;
+    height: 200px;
+    path {
+      fill: #ea5959;
+    }
+  }
+  && > div:nth-child(2) > svg {
+    width: 160px;
+    height: 160px;
+    path {
+      fill: #f98b60;
+    }
+  }
+  && > div:nth-child(3) > svg {
+    width: 120px;
+    height: 120px;
+    path {
+      fill: #ffc057;
+    }
+  }
+  && > div:nth-child(4) > svg {
+    width: 80px;
+    height: 80px;
+    path {
+      fill: #ffe084;
+    }
+  }
+`;
 class App extends React.Component {
   state = {
     numOfPoints: 4,
     isPlaying: false
   };
   componentDidMount() {
-    this.setupAnimeJS();
+    // this.setupAnimeJS();
   }
 
   componentDidUpdate() {
-    // this.setupAnimeJS();
+    this.setupAnimeJS();
   }
 
   handlePoints = e => {
@@ -38,7 +83,7 @@ class App extends React.Component {
 
   setupAnimeJS = () => {
     // const el = this.blob.querySelector("svg");
-    const morphing = this.morphing.querySelector("path");
+    const morphings = document.querySelectorAll("path");
 
     // anime({
     //   targets: el,
@@ -57,16 +102,18 @@ class App extends React.Component {
     for (let i = 0; i < MAX; i++) {
       paths.push({
         value: getPathData(getPoints(numOfPoints, angle), angle),
-        duration: 400
+        duration: 200
       });
     }
 
     this.animation = anime({
-      targets: morphing,
+      targets: morphings,
       d: paths,
       loop: true,
       direction: "alternate",
       easing: "easeInSine",
+      // translateX: [0, 40, 100],
+      scale: [1, 1.2, 0.7, 0.9, 1],
       // autoplay: false,
       duration: 1500
     });
@@ -109,10 +156,24 @@ class App extends React.Component {
           dangerouslySetInnerHTML={{ __html: blobString }}
         /> */}
 
-        <div
-          ref={ref => (this.morphing = ref)}
-          dangerouslySetInnerHTML={{ __html: blobString }}
-        />
+        <Wrapper>
+          <div
+            ref={ref => (this.morphing1 = ref)}
+            dangerouslySetInnerHTML={{ __html: blobString }}
+          />
+          <div
+            ref={ref => (this.morphing2 = ref)}
+            dangerouslySetInnerHTML={{ __html: blobString }}
+          />
+          <div
+            ref={ref => (this.morphing3 = ref)}
+            dangerouslySetInnerHTML={{ __html: blobString }}
+          />
+          <div
+            ref={ref => (this.morphing4 = ref)}
+            dangerouslySetInnerHTML={{ __html: blobString }}
+          />
+        </Wrapper>
         <div>
           <button onClick={this.refresh}>Refresh</button>
           <button onClick={() => this.download(blobString)}>Download</button>

@@ -77,13 +77,7 @@ function getPath(numOfPoints) {
   return `
       <path
         id="blob-path"
-        d="${getPathData(points, angle)} ${svgPath(
-    points.map(p => [p.x, p.y]),
-    lineCommand
-  )}"
-  stroke="black"
-        fill="url(#linear-gradient)"
-      />`;
+        d="${getPathData(points, angle)}" /> `;
 }
 
 function getPoints(numOfPoints, angle) {
