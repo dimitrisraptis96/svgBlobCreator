@@ -5,11 +5,14 @@ import anime from "animejs";
 import { saveAs } from "file-saver";
 import { createBlobString, getPathData, getPoints } from "./blob";
 
-const INITIAL_DIMS = [500, 500];
+const DIMS = [500, 500];
+const OFFSET = 100;
+const COLORS = ["ea5959", "f98b60", "ffc057", "ffe084"];
+
 const Wrapper = styled.div`
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: ${DIMS[0]}px;
+  height: ${DIMS[1]}px;
 
   display: flex;
   justify-content: center;
@@ -20,34 +23,17 @@ const Wrapper = styled.div`
     /* top: 50%;
     left: 50%; */
   }
-  && > div:nth-child(1) > svg {
-    width: 200px;
-    height: 200px;
+  ${Array(0, 1, 2, 3).map(
+    n => `
+    && > div:nth-child(${n + 1}) > svg {
+    width: ${DIMS[0] - OFFSET * n}px;
+    height: ${DIMS[1] - OFFSET * n}px;
     path {
-      fill: #ea5959;
+      fill: #${COLORS[n]};
     }
   }
-  && > div:nth-child(2) > svg {
-    width: 160px;
-    height: 160px;
-    path {
-      fill: #f98b60;
-    }
-  }
-  && > div:nth-child(3) > svg {
-    width: 120px;
-    height: 120px;
-    path {
-      fill: #ffc057;
-    }
-  }
-  && > div:nth-child(4) > svg {
-    width: 80px;
-    height: 80px;
-    path {
-      fill: #ffe084;
-    }
-  }
+    `
+  )}
 `;
 class App extends React.Component {
   state = {
@@ -109,7 +95,7 @@ class App extends React.Component {
     this.animation = anime({
       targets: morphings,
       d: paths,
-      loop: true,
+      // loop: true,
       direction: "alternate",
       easing: "easeInSine",
       // translateX: [0, 40, 100],
