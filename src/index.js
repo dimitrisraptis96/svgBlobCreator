@@ -135,7 +135,7 @@ class App extends React.Component {
             name="Points"
             min="4"
             step="2"
-            max="14"
+            max="20"
           />
         </div>
         {/* <div

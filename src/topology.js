@@ -3,7 +3,7 @@ import gradients from "./gradients";
 const CENTER_X = 300;
 const CENTER_Y = 300;
 const RADIUS = 200;
-const OFFSET = 10;
+const OFFSET = 50;
 
 const topology = {
   dims: [500, 500],
@@ -88,7 +88,7 @@ function getPathData(points, angle) {
       const nextIndex = isLast ? 0 : index + 1;
       const nextPoint = points[nextIndex];
       const mediumPoint = getPointOnCircle(
-        point.radius,
+        point.radius + RADIUS * 0.05,
         point.angle + (nextPoint.angle - point.angle) / 2
       );
       console.log(mediumPoint);
@@ -126,7 +126,7 @@ function getLinearGradient() {
 function createBlobString(numOfPoints) {
   const linearGradient = getLinearGradient();
   const radiusSeed = getRandomInt(OFFSET);
-  const angleOffset = 0.1 * getRandomInt(5);
+  const angleOffset = 0.1 * getRandomInt(3);
   const angle = findAngleRad(numOfPoints);
 
   return `
