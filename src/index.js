@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import styled from "styled-components";
 import anime from "animejs";
 import { saveAs } from "file-saver";
-import { createBlobString, getPathData, getPoints } from "./blob";
+import { createBlobString, getPathData, getPoints } from "./topology";
 
 const DIMS = [500, 500];
 const OFFSET = 100;
@@ -45,7 +45,7 @@ class App extends React.Component {
   }
 
   componentDidUpdate() {
-    this.setupAnimeJS();
+    // this.setupAnimeJS();
   }
 
   handlePoints = e => {
@@ -121,6 +121,7 @@ class App extends React.Component {
 
     // const controlButtonText = isPlaying ? "Stop" : "Play"};
     const blobString = createBlobString(numOfPoints);
+    console.log(blobString);
 
     return (
       <div>
@@ -141,8 +142,12 @@ class App extends React.Component {
           ref={ref => (this.blob = ref)}
           dangerouslySetInnerHTML={{ __html: blobString }}
         /> */}
+        <div
+          ref={ref => (this.morphing = ref)}
+          dangerouslySetInnerHTML={{ __html: blobString }}
+        />
 
-        <Wrapper>
+        {/* <Wrapper>
           <div
             ref={ref => (this.morphing1 = ref)}
             dangerouslySetInnerHTML={{ __html: blobString }}
@@ -159,7 +164,7 @@ class App extends React.Component {
             ref={ref => (this.morphing4 = ref)}
             dangerouslySetInnerHTML={{ __html: blobString }}
           />
-        </Wrapper>
+        </Wrapper> */}
         <div>
           <button onClick={this.refresh}>Refresh</button>
           <button onClick={() => this.download(blobString)}>Download</button>
