@@ -8,8 +8,8 @@ const OFFSET = 10;
 const topology = {
   dims: [500, 500],
   count: 4,
-  offset: 100,
-  colors: ["ea5959", "f98b60", "ffc057", "ffe084"]
+  offset: 40,
+  colors: ["#ea5959", "#f98b60", "#ffc057", "#ffe084"]
 };
 
 function getRandomInt(max) {
@@ -27,7 +27,7 @@ function getPointOnCircle(radius, angle) {
   // const radius = RADIUS - radius - offset;
   var x = CENTER_X + radius * Math.cos((angle * Math.PI) / 180);
   var y = CENTER_Y + radius * Math.sin((angle * Math.PI) / 180);
-  return { x, y, angle };
+  return { x, y, angle, radius };
 }
 
 function findAngleRad(numOfPoints) {
@@ -39,33 +39,6 @@ function getPathTransform() {
   const skewY = `skewY(${getRandomInt(10)})`;
   const rotate = `rotate(${getRandomInt(360)} ${CENTER_X} ${CENTER_Y})`;
   return `${skewX} ${skewY} ${rotate}`;
-}
-
-function getPathData(points, angle) {
-  const numOfPoints = points.length;
-
-  return points
-    .map((point, index) => {
-      const isFirst = index === 0;
-      const isLast = index + 1 === numOfPoints;
-
-      const nextIndex = isLast ? 0 : index + 1;
-      const nextPoint = points[nextIndex];
-      const mediumPoint = getPointOnCircle(
-        point.angle + (nextPoint.angle - point.angle) / 2
-      );
-
-      if (isFirst) {
-        return `
-        M  ${point.x} ${point.y}
-        Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${nextPoint.y} 
-    `;
-      } else {
-        return `T ${nextPoint.x} ${nextPoint.y}`;
-      }
-    })
-    .join(" ");
-  // .replace(" ", "");
 }
 
 // const svgPath = (points, command) => {
@@ -85,6 +58,7 @@ function getPathData(points, angle) {
 
 function getPath(numOfPoints, radius, angle, index) {
   const points = getPoints(numOfPoints, angle, radius);
+  console.log(points);
 
   return `
       <path
@@ -100,6 +74,35 @@ function getPoints(numOfPoints, angle, radius) {
     points.push(point);
   }
   return points;
+}
+
+function getPathData(points, angle) {
+  const numOfPoints = points.length;
+
+  return points
+    .map((point, index) => {
+      const isFirst = index === 0;
+      const isLast = index + 1 === numOfPoints;
+
+      const nextIndex = isLast ? 0 : index + 1;
+      const nextPoint = points[nextIndex];
+      const mediumPoint = getPointOnCircle(
+        point.radius,
+        point.angle + (nextPoint.angle - point.angle) / 2
+      );
+      console.log(mediumPoint);
+
+      if (isFirst) {
+        return `
+        M  ${point.x} ${point.y}
+        Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${nextPoint.y} 
+    `;
+      } else {
+        return `T ${nextPoint.x} ${nextPoint.y}`;
+      }
+    })
+    .join(" ");
+  // .replace(" ", "");
 }
 
 function getRandomGradientColors() {
