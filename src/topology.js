@@ -56,21 +56,22 @@ function getPathTransform() {
 
 // const lineCommand = point => `L ${point[0]} ${point[1]}`;
 
-function getPath(numOfPoints, radius, angle, index) {
-  const points = getPoints(numOfPoints, angle, radius);
+function getPath(numOfPoints, radius, angle, index, angleOffset) {
+  const points = getPoints(numOfPoints, angle, angleOffset, radius);
   console.log(points);
 
   return `
       <path
-        id="blob-path"
+        id="depth-level-${index}"
         fill="${topology.colors[index]}"
         d="${getPathData(points, angle)}" /> `;
 }
 
-function getPoints(numOfPoints, angle, radius) {
+function getPoints(numOfPoints, angle, angleOffset, radius) {
   const points = [];
   for (let i = 0; i < numOfPoints; i++) {
-    var point = getPointOnCircle(radius, (i + 1) * angle);
+    var offset = (angleOffset * angle * -1) ^ i;
+    var point = getPointOnCircle(radius, (i + 1) * angle + offset);
     points.push(point);
   }
   return points;
@@ -125,7 +126,7 @@ function getLinearGradient() {
 function createBlobString(numOfPoints) {
   const linearGradient = getLinearGradient();
   const radiusSeed = getRandomInt(OFFSET);
-  const angleSeed = 0.1 * getRandomInt(3);
+  const angleOffset = 0.1 * getRandomInt(5);
   const angle = findAngleRad(numOfPoints);
 
   return `
@@ -141,7 +142,7 @@ function createBlobString(numOfPoints) {
         ${[...Array(topology.count)]
           .map((x, index) => {
             const radius = RADIUS - index * topology.offset - radiusSeed;
-            return getPath(numOfPoints, radius, angle, index);
+            return getPath(numOfPoints, radius, angle, index, angleOffset);
           })
           .join(" ")}
         </g>
