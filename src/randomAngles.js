@@ -92,7 +92,7 @@ function getPath(numOfPoints, radius, angles, index, angleOffset, radiusSeeds) {
       d="${getPathData(points, angles)}" /> 
       <path
       id="depth-level-${index}"
-      stroke="black"
+      stroke="gray"
       d="${getLinePathData(points, angles)}" />
     ${drawCircles(points)} 
     `;
@@ -128,7 +128,7 @@ function getLinePathData(points, angles) {
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign,
+        point.radius + offset * sign * sign,
         point.angle + angleToAdd
       );
 
@@ -163,18 +163,14 @@ function drawCircles(points) {
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign,
+        point.radius + offset * sign * sign,
         point.angle + angleToAdd
       );
       console.log(mediumPoint);
 
       return `
-      <circle fill="${isFirst ? "black" : "black"}" cx=" ${point.x}" cy="${
-        point.y
-      }" r="5"/>
-      <circle fill="${isLast ? "red" : "red"}" cx=" ${mediumPoint.x}" cy="${
-        mediumPoint.y
-      }" r="5"/>
+      <circle fill="black" cx=" ${point.x}" cy="${point.y}" r="10"/>
+      <circle fill="gray" cx=" ${mediumPoint.x}" cy="${mediumPoint.y}" r="5"/>
     `;
     })
     .join(" ");
@@ -203,7 +199,7 @@ function getPathData(points, angles) {
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign,
+        point.radius + offset * sign * sign,
         point.angle + angleToAdd
       );
       // draw lines
