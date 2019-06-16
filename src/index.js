@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import styled from "styled-components";
 import anime from "animejs";
 import { saveAs } from "file-saver";
-import { createBlobString, getPathData, getPoints } from "./topology";
+import { createBlobString, getPathData, getPoints } from "./randomAngles";
 
 const DIMS = [500, 500];
 const OFFSET = 100;
