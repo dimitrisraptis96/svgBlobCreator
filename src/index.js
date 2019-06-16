@@ -121,7 +121,7 @@ class App extends React.Component {
 
     // const controlButtonText = isPlaying ? "Stop" : "Play"};
     const blobString = createBlobString(numOfPoints);
-    console.log(blobString);
+    // console.log(blobString);
 
     return (
       <div>
