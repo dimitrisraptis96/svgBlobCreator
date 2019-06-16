@@ -4,12 +4,12 @@ import { useLayoutEffect } from "react";
 const CENTER_X = 300;
 const CENTER_Y = 300;
 const RADIUS = 200;
-const OFFSET = 100;
+const OFFSET = 10;
 
 const topology = {
   dims: [500, 500],
   count: 4,
-  offset: 40,
+  offset: 0,
   colors: ["#ea5959", "#f98b60", "#ffc057", "#ffe084"]
 };
 
@@ -23,8 +23,8 @@ function getAngles(max, numOfParts) {
   var sum = 0;
   for (var i = 0; i < numOfParts - 1; i++) {
     var angle0To90 = getRandomIntBetween(
-      angle - angle * 0.2,
-      angle + angle * 0.2
+      angle - angle * 0.01,
+      angle + angle * 0.01
     );
     if (i === 0) {
       arr[i] = angle0To90;
@@ -75,28 +75,110 @@ function getPathTransform() {
 
 // const lineCommand = point => `L ${point[0]} ${point[1]}`;
 
-function getPath(numOfPoints, radius, angles, index, angleOffset) {
-  const points = getPoints(numOfPoints, angles, angleOffset, radius);
+function getPath(numOfPoints, radius, angles, index, angleOffset, radiusSeeds) {
+  const points = getPoints(
+    numOfPoints,
+    angles,
+    angleOffset,
+    radius,
+    radiusSeeds
+  );
   // console.log(points);
 
-  // fill="${topology.colors[index]}"
   return `
+    <path
+      id="depth-level-${index}"
+      fill="${topology.colors[index]}"
+      d="${getPathData(points, angles)}" /> 
       <path
-        id="depth-level-${index}"
-        fill="none"
-        stroke="black"
-        d="${getPathData(points, angles)}" /> `;
+      id="depth-level-${index}"
+      stroke="black"
+      d="${getLinePathData(points, angles)}" />
+    ${drawCircles(points)} 
+    `;
 }
 
-function getPoints(numOfPoints, angles, angleOffset, radius) {
+function getPoints(numOfPoints, angles, angleOffset, radius, radiusSeeds) {
   const points = [];
   for (let i = 0; i < numOfPoints; i++) {
     // var offset = (angleOffset * angle * -1) ^ i;
     // var point = getPointOnCircle(radius, (i + 1) * angle + offset);
-    var point = getPointOnCircle(radius, angles[i]);
+    var point = getPointOnCircle(radius + radiusSeeds[i], angles[i]);
     points.push(point);
   }
   return points;
+}
+
+function getLinePathData(points, angles) {
+  const numOfPoints = points.length;
+  return points
+    .map((point, index) => {
+      const isFirst = index === 0;
+      const isLast = index + 1 === numOfPoints;
+
+      const nextIndex = isLast ? 0 : index + 1;
+      const nextPoint = points[nextIndex];
+      const dist = Math.pow(
+        Math.pow(point.x - nextPoint.x, 2) + Math.pow(point.y - nextPoint.y, 2),
+        1 / 2
+      );
+      const sign = Math.pow(-1, index);
+      const offset = 0.1 * dist;
+      const angleToAdd = isLast
+        ? nextPoint.angle / 2
+        : (nextPoint.angle - point.angle) / 2;
+      const mediumPoint = getPointOnCircle(
+        point.radius + offset * sign,
+        point.angle + angleToAdd
+      );
+
+      return `
+        M  ${point.x} ${point.y}
+        L  ${mediumPoint.x} ${mediumPoint.y} 
+        M  ${mediumPoint.x} ${mediumPoint.y} 
+        L  ${nextPoint.x} ${nextPoint.y} 
+    `;
+    })
+    .join(" ");
+  // .replace(" ", "");
+}
+
+function drawCircles(points) {
+  const numOfPoints = points.length;
+  return points
+    .map((point, index) => {
+      const isFirst = index === 0;
+
+      const isLast = index + 1 === numOfPoints;
+
+      const nextIndex = isLast ? 0 : index + 1;
+      const nextPoint = points[nextIndex];
+      const dist = Math.pow(
+        Math.pow(point.x - nextPoint.x, 2) + Math.pow(point.y - nextPoint.y, 2),
+        1 / 2
+      );
+      const sign = Math.pow(-1, index);
+      const offset = 0.1 * dist;
+      const angleToAdd = isLast
+        ? nextPoint.angle / 2
+        : (nextPoint.angle - point.angle) / 2;
+      const mediumPoint = getPointOnCircle(
+        point.radius + offset * sign,
+        point.angle + angleToAdd
+      );
+      console.log(mediumPoint);
+
+      return `
+      <circle fill="${isFirst ? "black" : "black"}" cx=" ${point.x}" cy="${
+        point.y
+      }" r="5"/>
+      <circle fill="${isLast ? "red" : "red"}" cx=" ${mediumPoint.x}" cy="${
+        mediumPoint.y
+      }" r="5"/>
+    `;
+    })
+    .join(" ");
+  // .replace(" ", "");
 }
 
 function getPathData(points, angles) {
@@ -111,15 +193,18 @@ function getPathData(points, angles) {
       const nextIndex = isLast ? 0 : index + 1;
       const nextPoint = points[nextIndex];
       const dist = Math.pow(
-        (point.x - nextPoint.x) * (point.x - nextPoint.x) +
-          (point.y - nextPoint.y) * (point.y - nextPoint.y),
+        Math.pow(point.x - nextPoint.x, 2) + Math.pow(point.y - nextPoint.y, 2),
         1 / 2
       );
-      console.log(dist);
 
+      const sign = Math.pow(-1, index);
+      const offset = 0.1 * dist;
+      const angleToAdd = isLast
+        ? nextPoint.angle / 2
+        : (nextPoint.angle - point.angle) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + 0.1 * dist,
-        point.angle + (nextPoint.angle - point.angle) / 2
+        point.radius + offset * sign,
+        point.angle + angleToAdd
       );
       // draw lines
       // return `
@@ -157,12 +242,16 @@ function getLinearGradient() {
       </linearGradient>`;
 }
 
-function createBlobString(numOfPoints) {
+function createBlobString(numOfPoints, radiusOffset) {
   const linearGradient = getLinearGradient();
-  const radiusSeed = getRandomInt(OFFSET);
+  var radiusSeeds = [];
+  for (var i = 0; i < numOfPoints; i++) {
+    radiusSeeds.push(getRandomIntBetween(-radiusOffset, radiusOffset));
+  }
   const angleOffset = 0.1 * getRandomInt(3);
   // const angle = findAngleRad(numOfPoints);
   const angles = getAngles(360, numOfPoints);
+  console.log(radiusSeeds);
 
   return `
       <svg
@@ -178,8 +267,15 @@ function createBlobString(numOfPoints) {
         <g>
         ${[...Array(topology.count)]
           .map((x, index) => {
-            const radius = RADIUS - index * topology.offset - radiusSeed;
-            return getPath(numOfPoints, radius, angles, index, angleOffset);
+            const radius = RADIUS - index * topology.offset;
+            return getPath(
+              numOfPoints,
+              radius,
+              angles,
+              index,
+              angleOffset,
+              radiusSeeds
+            );
           })
           .join(" ")}
         </g>

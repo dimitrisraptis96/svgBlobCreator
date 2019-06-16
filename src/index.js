@@ -38,6 +38,7 @@ const Wrapper = styled.div`
 class App extends React.Component {
   state = {
     numOfPoints: 4,
+    radiusOffset: 0,
     isPlaying: false
   };
   componentDidMount() {
@@ -48,6 +49,9 @@ class App extends React.Component {
     // this.setupAnimeJS();
   }
 
+  handleOffset = e => {
+    this.setState({ radiusOffset: e.target.value });
+  };
   handlePoints = e => {
     this.setState({ numOfPoints: e.target.value });
   };
@@ -117,11 +121,12 @@ class App extends React.Component {
   };
 
   render() {
-    const { numOfPoints, isPlaying } = this.state;
+    const { numOfPoints, isPlaying, radiusOffset } = this.state;
 
     // const controlButtonText = isPlaying ? "Stop" : "Play"};
-    const blobString = createBlobString(numOfPoints);
-    console.log(blobString);
+    const blobString = createBlobString(numOfPoints, radiusOffset);
+    // console.log(blobString);
+    console.log(this.state);
 
     return (
       <div>
@@ -133,9 +138,22 @@ class App extends React.Component {
             value={numOfPoints}
             id="points"
             name="Points"
-            min="4"
+            min="2"
             step="2"
             max="20"
+          />
+        </div>
+        <div>
+          <label htmlFor="points">Curvation: </label>
+          <input
+            onChange={this.handleOffset}
+            type="range"
+            value={radiusOffset}
+            id="curve"
+            name="curve"
+            min="0"
+            step="1"
+            max="15"
           />
         </div>
         {/* <div
