@@ -75,7 +75,15 @@ function getPathTransform() {
 
 // const lineCommand = point => `L ${point[0]} ${point[1]}`;
 
-function getPath(numOfPoints, radius, angles, index, angleOffset, radiusSeeds) {
+function getPath(
+  numOfPoints,
+  radius,
+  angles,
+  index,
+  angleOffset,
+  radiusSeeds,
+  hasGuides
+) {
   const points = getPoints(
     numOfPoints,
     angles,
@@ -90,11 +98,14 @@ function getPath(numOfPoints, radius, angles, index, angleOffset, radiusSeeds) {
       id="depth-level-${index}"
       fill="${topology.colors[index]}"
       d="${getPathData(points, angles)}" /> 
-      <path
-      id="depth-level-${index}"
-      stroke="gray"
-      d="${getLinePathData(points, angles)}" />
-    ${drawCircles(points)} 
+      ${hasGuides &&
+        `
+        <path
+        id="depth-level-${index}"
+        stroke="gray"
+        d="${getLinePathData(points, angles)}" />
+      ${drawCircles(points)}
+        `}
     `;
 }
 
@@ -127,8 +138,9 @@ function getLinePathData(points, angles) {
       const angleToAdd = isLast
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
+      const radiusToAdd = (nextPoint.radius - point.radius) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign * sign,
+        point.radius + radiusToAdd + offset * sign,
         point.angle + angleToAdd
       );
 
@@ -162,8 +174,9 @@ function drawCircles(points) {
       const angleToAdd = isLast
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
+      const radiusToAdd = (nextPoint.radius - point.radius) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign * sign,
+        point.radius + radiusToAdd + offset * sign,
         point.angle + angleToAdd
       );
       console.log(mediumPoint);
@@ -198,8 +211,9 @@ function getPathData(points, angles) {
       const angleToAdd = isLast
         ? nextPoint.angle / 2
         : (nextPoint.angle - point.angle) / 2;
+      const radiusToAdd = (nextPoint.radius - point.radius) / 2;
       const mediumPoint = getPointOnCircle(
-        point.radius + offset * sign * sign,
+        point.radius + radiusToAdd + offset * sign,
         point.angle + angleToAdd
       );
       // draw lines
@@ -210,8 +224,8 @@ function getPathData(points, angles) {
 
       if (isFirst) {
         return `
-        M  ${point.x} ${point.y}
-        Q  ${mediumPoint.x} ${mediumPoint.y} ${nextPoint.x} ${nextPoint.y} 
+        M  ${point.x}, ${point.y}
+        Q  ${mediumPoint.x}, ${mediumPoint.y} ${nextPoint.x}, ${nextPoint.y} 
     `;
       } else {
         return `T ${nextPoint.x} ${nextPoint.y}`;
@@ -238,7 +252,7 @@ function getLinearGradient() {
       </linearGradient>`;
 }
 
-function createBlobString(numOfPoints, radiusOffset) {
+function createBlobString(hasGuides, numOfPoints, radiusOffset) {
   const linearGradient = getLinearGradient();
   var radiusSeeds = [];
   for (var i = 0; i < numOfPoints; i++) {
@@ -270,7 +284,8 @@ function createBlobString(numOfPoints, radiusOffset) {
               angles,
               index,
               angleOffset,
-              radiusSeeds
+              radiusSeeds,
+              hasGuides
             );
           })
           .join(" ")}

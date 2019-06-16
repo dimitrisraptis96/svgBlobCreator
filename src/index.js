@@ -4,6 +4,8 @@ import styled from "styled-components";
 import anime from "animejs";
 import { saveAs } from "file-saver";
 import { createBlobString, getPathData, getPoints } from "./randomAngles";
+import Toggle from "react-toggle";
+import "react-toggle/style.css"; // for ES6 modules
 
 const DIMS = [500, 500];
 const OFFSET = 100;
@@ -39,7 +41,8 @@ class App extends React.Component {
   state = {
     numOfPoints: 4,
     radiusOffset: 0,
-    isPlaying: false
+    isPlaying: false,
+    hasGuides: false
   };
   componentDidMount() {
     // this.setupAnimeJS();
@@ -52,6 +55,12 @@ class App extends React.Component {
   handleOffset = e => {
     this.setState({ radiusOffset: e.target.value });
   };
+  handleGuides = () => {
+    const { hasGuides } = this.state;
+
+    this.setState({ hasGuides: !hasGuides });
+  };
+
   handlePoints = e => {
     this.setState({ numOfPoints: e.target.value });
   };
@@ -121,15 +130,19 @@ class App extends React.Component {
   };
 
   render() {
-    const { numOfPoints, isPlaying, radiusOffset } = this.state;
+    const { hasGuides, numOfPoints, isPlaying, radiusOffset } = this.state;
 
     // const controlButtonText = isPlaying ? "Stop" : "Play"};
-    const blobString = createBlobString(numOfPoints, radiusOffset);
+    const blobString = createBlobString(hasGuides, numOfPoints, radiusOffset);
     // console.log(blobString);
     console.log(this.state);
 
     return (
       <div>
+        <label>
+          <Toggle defaultChecked={hasGuides} onChange={this.handleGuides} />
+          <span>Guides</span>
+        </label>
         <div>
           <label htmlFor="points">Complexity: </label>
           <input
