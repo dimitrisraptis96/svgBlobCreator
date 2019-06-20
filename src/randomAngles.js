@@ -18,25 +18,21 @@ function getRandomIntBetween(min, max) {
 }
 
 function getAngles(max, numOfParts) {
+  const factor = 0.01;
   const angle = findAngleRad(numOfParts);
-  var arr = [];
-  var sum = 0;
-  for (var i = 0; i < numOfParts - 1; i++) {
-    var angle0To90 = getRandomIntBetween(
-      angle - angle * 0.01,
-      angle + angle * 0.01
-    );
-    if (i === 0) {
-      arr[i] = angle0To90;
-    } else {
-      arr[i] = arr[i - 1] + angle0To90;
-    }
-    sum += arr[i];
-  }
 
-  arr[numOfParts - 1] = 360;
-  console.log(arr);
-  return arr;
+  const angles = [];
+  for (let i = 0; i < numOfParts - 1; i++) {
+    const isFirst = i === 0;
+    const angle0To90 = getRandomIntBetween(
+      angle - angle * factor,
+      angle + angle * factor
+    );
+    angles[i] = isFirst ? angle0To90 : angles[i - 1] + angle0To90;
+  }
+  // final angle should be 360 degrees
+  angles[numOfParts - 1] = 360;
+  return angles;
 }
 
 function getRandomInt(max) {
@@ -114,7 +110,7 @@ function getPoints(numOfPoints, angles, angleOffset, radius, radiusSeeds) {
   for (let i = 0; i < numOfPoints; i++) {
     // var offset = (angleOffset * angle * -1) ^ i;
     // var point = getPointOnCircle(radius, (i + 1) * angle + offset);
-    var point = getPointOnCircle(radius + radiusSeeds[i], angles[i]);
+    var point = getPointOnCircle(radius[i], angles[i]);
     points.push(point);
   }
   return points;
@@ -252,17 +248,7 @@ function getLinearGradient() {
       </linearGradient>`;
 }
 
-function createBlobString(hasGuides, numOfPoints, radiusOffset) {
-  const linearGradient = getLinearGradient();
-  var radiusSeeds = [];
-  for (var i = 0; i < numOfPoints; i++) {
-    radiusSeeds.push(getRandomIntBetween(-radiusOffset, radiusOffset));
-  }
-  const angleOffset = 0.1 * getRandomInt(3);
-  // const angle = findAngleRad(numOfPoints);
-  const angles = getAngles(360, numOfPoints);
-  console.log(radiusSeeds);
-
+function createSvg(path, gradient) {
   return `
       <svg
         id="blob-svg"
@@ -273,26 +259,53 @@ function createBlobString(hasGuides, numOfPoints, radiusOffset) {
         console.log(arr);
         3.org/2000/svg"
       >
-        <defs>${linearGradient}</defs>
+        <defs>${gradient}</defs>
         <g>
-        ${[...Array(topology.count)]
-          .map((x, index) => {
-            const radius = RADIUS - index * topology.offset;
-            return getPath(
-              numOfPoints,
-              radius,
-              angles,
-              index,
-              angleOffset,
-              radiusSeeds,
-              hasGuides
-            );
-          })
-          .join(" ")}
+        ${path}
         </g>
       </svg>
     `;
 }
 
+function calculateRandomRadiusOffsets(numOfPoints, offset) {
+  var offsets = [];
+  for (var i = 0; i < numOfPoints; i++) {
+    offsets.push(getRandomIntBetween(-offset, offset));
+  }
+  return offsets;
+}
+
+function getBlob(numOfPoints, radiusOffset, hasGuides) {
+  const radiusOffsets = calculateRandomRadiusOffsets(numOfPoints, radiusOffset);
+  const angleOffset = 0.1 * getRandomInt(3);
+
+  const angles = getAngles(360, numOfPoints);
+  console.log(radiusOffsets);
+
+  return [...Array(topology.count)]
+    .map((x, index) => {
+      const radius = radiusOffsets.map(
+        offset => RADIUS - index * topology.offset + offset
+      );
+
+      return getPath(
+        numOfPoints,
+        radius,
+        angles,
+        index,
+        angleOffset,
+        radiusOffsets,
+        hasGuides
+      );
+    })
+    .join(" ");
+}
+function createBlobString(hasGuides, numOfPoints, radiusOffset) {
+  const linearGradient = getLinearGradient();
+  const blob = getBlob(numOfPoints, radiusOffset, hasGuides);
+  // const topology = getTopology();
+
+  return createSvg(blob, linearGradient);
+}
+
 export { createBlobString, getPathData, getPoints };
-//
