@@ -56,41 +56,13 @@ function getPathTransform() {
   return `${skewX} ${skewY} ${rotate}`;
 }
 
-// const svgPath = (points, command) => {
-//   // build the d attributes by looping over the points
-//   return points.reduce(
-//     (acc, point, i, a) =>
-//       i === 0
-//         ? // if first point
-//           `M ${point[0]},${point[1]}`
-//         : // else
-//           `${acc} ${command(point, i, a)}`,
-//     ""
-//   );
-// };
-
-// const lineCommand = point => `L ${point[0]} ${point[1]}`;
-
-function getPath(
-  numOfPoints,
-  radius,
-  angles,
-  index,
-  angleOffset,
-  radiusSeeds,
-  hasGuides
-) {
-  const points = getPoints(
-    numOfPoints,
-    angles,
-    angleOffset,
-    radius,
-    radiusSeeds
-  );
+function getPath(numOfPoints, radius, angles, index, hasGuides) {
+  const points = getPoints(numOfPoints, angles, radius);
   // console.log(points);
 
   return `
     <path
+      transform="${getPathTransform()}"    
       id="depth-level-${index}"
       fill="${topology.colors[index]}"
       d="${getPathData(points, angles)}" /> 
@@ -105,7 +77,7 @@ function getPath(
     `;
 }
 
-function getPoints(numOfPoints, angles, angleOffset, radius, radiusSeeds) {
+function getPoints(numOfPoints, angles, radius) {
   const points = [];
   for (let i = 0; i < numOfPoints; i++) {
     // var offset = (angleOffset * angle * -1) ^ i;
@@ -255,9 +227,7 @@ function createSvg(path, gradient) {
         width="300"
         height="300"
         viewBox="0 0 600 600"
-        xmlns="http://www.w
-        console.log(arr);
-        3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
       >
         <defs>${gradient}</defs>
         <g>
@@ -277,10 +247,7 @@ function calculateRandomRadiusOffsets(numOfPoints, offset) {
 
 function getBlob(numOfPoints, radiusOffset, hasGuides) {
   const radiusOffsets = calculateRandomRadiusOffsets(numOfPoints, radiusOffset);
-  const angleOffset = 0.1 * getRandomInt(3);
-
   const angles = getAngles(360, numOfPoints);
-  console.log(radiusOffsets);
 
   return [...Array(topology.count)]
     .map((x, index) => {
@@ -288,15 +255,7 @@ function getBlob(numOfPoints, radiusOffset, hasGuides) {
         offset => RADIUS - index * topology.offset + offset
       );
 
-      return getPath(
-        numOfPoints,
-        radius,
-        angles,
-        index,
-        angleOffset,
-        radiusOffsets,
-        hasGuides
-      );
+      return getPath(numOfPoints, radius, angles, index, hasGuides);
     })
     .join(" ");
 }
