@@ -9,7 +9,7 @@ const OFFSET = 10;
 const topology = {
   dims: [500, 500],
   count: 4,
-  offset: 0,
+  offset: 40,
   colors: ["#ea5959", "#f98b60", "#ffc057", "#ffe084"]
 };
 
@@ -17,26 +17,21 @@ function getRandomIntBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function getAngles(max, numOfParts) {
+function getAngles(max, length) {
   const factor = 0.01;
-  const angle = findAngleRad(numOfParts);
+  const angle = findAngleRad(length);
 
   const angles = [];
-  for (let i = 0; i < numOfParts - 1; i++) {
+  for (let i = 0; i < length - 1; i++) {
     const isFirst = i === 0;
-    const angle0To90 = getRandomIntBetween(
-      angle - angle * factor,
-      angle + angle * factor
-    );
+    const min = angle - angle * factor;
+    const max = angle + angle * factor;
+    const angle0To90 = getRandomIntBetween(min, max);
     angles[i] = isFirst ? angle0To90 : angles[i - 1] + angle0To90;
   }
   // final angle should be 360 degrees
-  angles[numOfParts - 1] = 360;
+  angles[length - 1] = 360;
   return angles;
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
 }
 
 function getPointOnCircle(radius, angle) {
@@ -50,30 +45,22 @@ function findAngleRad(numOfPoints) {
 }
 
 function getPathTransform() {
-  const skewX = `skewX(${getRandomInt(10)})`;
-  const skewY = `skewY(${getRandomInt(10)})`;
-  const rotate = `rotate(${getRandomInt(360)} ${CENTER_X} ${CENTER_Y})`;
+  const skewX = `skewX(${getRandomIntBetween(0, 10)})`;
+  const skewY = `skewY(${getRandomIntBetween(0, 10)})`;
+  const rotate = `rotate(${getRandomIntBetween(
+    0,
+    360
+  )} ${CENTER_X} ${CENTER_Y})`;
   return `${skewX} ${skewY} ${rotate}`;
 }
 
-function getPath(numOfPoints, radius, angles, index, hasGuides) {
-  const points = getPoints(numOfPoints, angles, radius);
-  // console.log(points);
-
+function getPath(d, name, fill, stroke) {
   return `
     <path
-      transform="${getPathTransform()}"    
-      id="depth-level-${index}"
-      fill="${topology.colors[index]}"
-      d="${getPathData(points, angles)}" /> 
-      ${hasGuides &&
-        `
-        <path
-        id="depth-level-${index}"
-        stroke="gray"
-        d="${getLinePathData(points, angles)}" />
-      ${drawCircles(points)}
-        `}
+      id="${name}"
+      fill="${fill}"
+      stroke="${stroke}"
+      d="${d}" /> 
     `;
 }
 
@@ -230,7 +217,7 @@ function createSvg(path, gradient) {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>${gradient}</defs>
-        <g>
+        <g transform="${getPathTransform()}"  >
         ${path}
         </g>
       </svg>
@@ -238,7 +225,7 @@ function createSvg(path, gradient) {
 }
 
 function calculateRandomRadiusOffsets(numOfPoints, offset) {
-  var offsets = [];
+  const offsets = [];
   for (var i = 0; i < numOfPoints; i++) {
     offsets.push(getRandomIntBetween(-offset, offset));
   }
@@ -254,8 +241,22 @@ function getBlob(numOfPoints, radiusOffset, hasGuides) {
       const radius = radiusOffsets.map(
         offset => RADIUS - index * topology.offset + offset
       );
+      const points = getPoints(numOfPoints, angles, radius);
+      const name = `depth-level-${index}`;
+      const fill = topology.colors[index];
+      const stroke = "none";
+      const d = getPathData(points, angles);
+      const blobPath = getPath(d, name, fill, stroke);
 
-      return getPath(numOfPoints, radius, angles, index, hasGuides);
+      const guidesPath = getPath(
+        getLinePathData(points, angles),
+        name,
+        "none",
+        "gray"
+      );
+
+      return `${blobPath} ${hasGuides && guidesPath} ${hasGuides &&
+        drawCircles(points)}`;
     })
     .join(" ");
 }
